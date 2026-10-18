@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle != null ? pageTitle + ' — GestionRH' : 'GestionRH'}">GestionRH</title>
+    <meta name="description" content="Application de gestion des employés"/>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"/>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+
+    <!-- CSS Global -->
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <th:block th:replace="${head}"></th:block>
+</head>
+<body>
+
+<!--NAVBAR -->
+<nav class="navbar" th:if="${#authorization.expression('isAuthenticated()')}">
+    <div class="navbar-brand">
+        <i class="bi bi-building"></i>
+        <span>GestionEmployee</span>
+    </div>
+    <div class="navbar-links">
+        <!-- Admin links -->
+        <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+           th:href="@{/admin/dashboard}"
+           th:classappend="${#strings.startsWith(#request.requestURI, '/admin/dashboard') ? 'active' : ''}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+           th:href="@{/admin/employees/new}"
+           th:classappend="${#strings.startsWith(#request.requestURI, '/admin/employees/new') ? 'active' : ''}">
+            <i class="bi bi-person-plus"></i> Nouvel employé
+        </a>
+        <!-- Employee links -->
+        <a th:if="${#authorization.expression('hasRole(''EMPLOYEE'')')}"
+           th:href="@{/employee/profile}">
+            <i class="bi bi-person-circle"></i> Mon profil
+        </a>
+    </div>
+    <div class="navbar-user">
+        <span class="user-badge">
+            <i class="bi bi-person-fill"></i>
+            <span sec:authentication="name">Utilisateur</span>
+        </span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </button>
+        </form>
+    </div>
+</nav>
+
+<!-- ═══ CONTENU ═══ -->
+<main class="main-content" th:if="${#authorization.expression('isAuthenticated()')}">
+    <th:block th:replace="${content}"></th:block>
+</main>
+<main th:unless="${#authorization.expression('isAuthenticated()')}">
+    <th:block th:replace="${content}"></th:block>
+</main>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer" th:if="${#authorization.expression('isAuthenticated()')}">
+    <p>GestionEmployees</p>
+</footer>
+
+</body>
+</html>

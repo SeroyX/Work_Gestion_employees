@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${employee != null ? employee.prenom + ' ' + employee.nom + ' — GestionRH' : 'Employé — GestionRH'}">Employé — GestionRH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-brand"><i class="bi bi-building"></i><span>GestionRH</span></div>
+    <div class="navbar-links">
+        <a th:href="@{/admin/dashboard}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a th:href="@{/admin/employees/new}"><i class="bi bi-person-plus"></i> Nouvel employé</a>
+    </div>
+    <div class="navbar-user">
+        <span class="user-badge"><i class="bi bi-shield-fill"></i> Admin</span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Déconnexion</button>
+        </form>
+    </div>
+</nav>
+
+<main class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="bi bi-person-vcard"></i> Fiche Employé</h1>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+            <a th:href="@{/admin/employees/{id}/edit(id=${employee.id})}" class="btn-secondary">
+                <i class="bi bi-pencil"></i> Modifier
+            </a>
+            <a th:href="@{/admin/dashboard}" class="btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Carte profil -->
+    <div class="profile-card" th:if="${employee != null}">
+
+        <!-- En-tête avatar -->
+        <div class="profile-header">
+            <div class="profile-avatar-large"
+                 th:text="${#strings.substring(employee.prenom,0,1) + #strings.substring(employee.nom,0,1)}">
+                AB
+            </div>
+            <div class="profile-header-info">
+                <h2 th:text="${employee.prenom + ' ' + employee.nom}">Prénom Nom</h2>
+                <span class="badge-poste" th:text="${employee.poste != null ? employee.poste : 'Poste non défini'}"></span>
+                <span class="badge-dept" th:text="${employee.departement != null ? employee.departement : ''}"></span>
+            </div>
+        </div>
+
+        <!-- Grille infos -->
+        <div class="profile-grid">
+            <div class="info-item">
+                <i class="bi bi-envelope"></i>
+                <div>
+                    <span class="info-label">Email</span>
+                    <span class="info-value" th:text="${employee.email}">—</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="bi bi-calendar-event"></i>
+                <div>
+                    <span class="info-label">Âge</span>
+                    <span class="info-value" th:text="${employee.age + ' ans'}">—</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="bi bi-telephone"></i>
+                <div>
+                    <span class="info-label">Téléphone</span>
+                    <span class="info-value" th:text="${employee.telephone != null ? employee.telephone : '—'}">—</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="bi bi-calendar-check"></i>
+                <div>
+                    <span class="info-label">Date d'embauche</span>
+                    <span class="info-value"
+                          th:text="${employee.dateEmbauche != null ? #temporals.format(employee.dateEmbauche,'dd/MM/yyyy') : '—'}">—</span>
+                </div>
+            </div>
+            <div class="info-item form-grid-full">
+                <i class="bi bi-geo-alt"></i>
+                <div>
+                    <span class="info-label">Adresse</span>
+                    <span class="info-value" th:text="${employee.adresse != null ? employee.adresse : '—'}">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diplômes -->
+        <div class="diplomes-section">
+            <h3><i class="bi bi-mortarboard"></i> Diplômes</h3>
+            <div th:if="${#lists.isEmpty(employee.diplomes)}" class="empty-diplomes">
+                <p>Aucun diplôme enregistré.</p>
+            </div>
+            <div class="diplomes-list" th:unless="${#lists.isEmpty(employee.diplomes)}">
+                <div class="diplome-badge" th:each="d : ${employee.diplomes}">
+                    <div class="diplome-icon"><i class="bi bi-award"></i></div>
+                    <div>
+                        <strong th:text="${d.intitule}">Intitulé</strong>
+                        <span th:if="${d.etablissement}" th:text="' — ' + ${d.etablissement}"></span>
+                        <span th:if="${d.anneeObtention}" th:text="' (' + ${d.anneeObtention} + ')'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Cas employé introuvable -->
+    <div class="empty-state" th:if="${employee == null}">
+        <i class="bi bi-person-x" style="font-size:3rem; opacity:.4"></i>
+        <p>Employé introuvable.</p>
+        <a th:href="@{/admin/dashboard}" class="btn-primary">Retour au dashboard</a>
+    </div>
+
+</main>
+
+<footer class="footer"><p>© 2024 GestionRH</p></footer>
+</body>
+</html>
